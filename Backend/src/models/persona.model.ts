@@ -21,6 +21,19 @@ export class Persona extends Entity {
     type: 'string',
     required: true,
   })
+  Password: string;
+
+  @property({
+    type: 'string',
+    required: true,
+    generated: true,
+  })
+  Edad: string;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
   Email: string;
 
   @property({
@@ -28,6 +41,12 @@ export class Persona extends Entity {
     required: true,
   })
   Rol: string;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
+  Celular: string;
 
   @hasMany(() => Vehiculo)
   PersonaVehiculo: Vehiculo[];

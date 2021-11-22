@@ -1,3 +1,4 @@
+import { service } from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -19,11 +20,14 @@ import {
 } from '@loopback/rest';
 import {Persona} from '../models';
 import {PersonaRepository} from '../repositories';
+import { AutenticacionService } from '../services';
 
 export class PersonaController {
   constructor(
     @repository(PersonaRepository)
     public personaRepository : PersonaRepository,
+    @service(AutenticacionService)
+    public servicioAutenticacion:AutenticacionService
   ) {}
 
   @post('/personas')
@@ -44,7 +48,12 @@ export class PersonaController {
     })
     persona: Persona,
   ): Promise<Persona> {
-    return this.personaRepository.create(persona);
+    let password=this.servicioAutenticacion.GenerarPassword();
+    let passwordCifrado=this.servicioAutenticacion.CifrarPassword(password);
+    persona.Password=passwordCifrado;
+    let person=this.personaRepository.create(persona);
+    return person
+
   }
 
   @get('/personas/count')
