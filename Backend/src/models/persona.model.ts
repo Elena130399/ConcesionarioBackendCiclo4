@@ -15,6 +15,13 @@ export class Persona extends Entity {
     type: 'string',
     required: true,
   })
+
+  Usuario: string;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
   NombrePersona: string;
 
   @property({
