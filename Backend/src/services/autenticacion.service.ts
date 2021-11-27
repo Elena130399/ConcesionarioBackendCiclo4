@@ -1,9 +1,18 @@
-import { injectable, /* inject, */ BindingScope } from '@loopback/core';
+import { /* inject, */ BindingScope, injectable} from '@loopback/core';
+import {repository} from '@loopback/repository';
+import {Keys} from '../config/keys';
+import {Persona} from '../models';
+import {PersonaRepository} from '../repositories';
 const generador = require("password-generator");
 const crypto = require("crypto-js");
-@injectable({ scope: BindingScope.TRANSIENT })
+const jwt = require("jsonwebtoken");
+
+@injectable({scope: BindingScope.TRANSIENT})
 export class AutenticacionService {
-  constructor(/* Add @inject to inject parameters */) { }
+  constructor(
+    @repository(PersonaRepository)
+    public personaRepositorio: PersonaRepository
+  ) { }
 
   /*
    * Add service methods here
@@ -16,5 +25,39 @@ export class AutenticacionService {
     let passwordCifrado = crypto.MD5(password).toString();
     return passwordCifrado;
 
+  }
+  IdentificarPersona(usuario: string, clave: string) {
+    try {
+      let persona = this.personaRepositorio.findOne({where: {Email: usuario, Password: clave}});
+      if (persona) {
+        return persona;
+      } else {
+        return false;
+      }
+    } catch {
+      return false;
+    }
+  }
+
+  GenerarJWT(persona: Persona) {
+    let token = jwt.sign({
+      data: {
+        id: persona.IdPersona,
+        correo: persona.Email,
+        nombre: persona.NombrePersona,
+        rol: "Cliente"
+      }
+    }, Keys.claveJWT
+    );
+    return token;
+  }
+
+  ValidarJWT(token: string) {
+    try {
+      let datos = jwt.verify(token, Keys.claveJWT);
+      return datos;
+    } catch {
+      return false;
+    }
   }
 }
