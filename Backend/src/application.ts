@@ -1,14 +1,18 @@
+import {AuthenticationComponent, registerAuthenticationStrategy} from '@loopback/authentication';
 import {BootMixin} from '@loopback/boot';
 import {ApplicationConfig} from '@loopback/core';
-import {
-  RestExplorerBindings,
-  RestExplorerComponent,
-} from '@loopback/rest-explorer';
 import {RepositoryMixin} from '@loopback/repository';
 import {RestApplication} from '@loopback/rest';
+import {
+  RestExplorerBindings,
+  RestExplorerComponent
+} from '@loopback/rest-explorer';
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
 import {MySequence} from './sequence';
+import {EstrategiaCliente} from './strategies/cliente.Strategy';
+import {EstrategiaAsesor} from '../strategies/asesor.Strategy';
+import {EstrategiaAdministrador} from '../strategies/administrador.Strategy';
 
 export {ApplicationConfig};
 
@@ -40,5 +44,14 @@ export class App extends BootMixin(
         nested: true,
       },
     };
+
+    //se agregan las estrategias creadas
+    registerAuthenticationStrategy(this, EstrategiaCliente);
+    registerAuthenticationStrategy(this, EstrategiaAdministrador);
+    registerAuthenticationStrategy(this, EstrategiaAsesor);
+
+
+    //se agrega el componente de autenticación
+    this.component(AuthenticationComponent);
   }
 }
